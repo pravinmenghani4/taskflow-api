@@ -7,7 +7,7 @@ from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_db, get_task_or_404
-from app.models.task import Task
+from app.models.task import Task, TaskStatus
 from app.schemas.task import TaskCreate, TaskRead, TaskUpdate
 from app.services import task_service
 
@@ -15,8 +15,14 @@ router = APIRouter(prefix="/tasks", tags=["tasks"])
 
 
 @router.get("", response_model=list[TaskRead])
-def list_tasks(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    return task_service.list_tasks(db, skip=skip, limit=limit)
+def list_tasks(
+    skip: int = 0,
+    limit: int = 100,
+    status: TaskStatus | None = None,
+    q: str | None = None,
+    db: Session = Depends(get_db),
+):
+    return task_service.list_tasks(db, skip=skip, limit=limit, status=status, q=q)
 
 
 @router.post("", response_model=TaskRead, status_code=status.HTTP_201_CREATED)

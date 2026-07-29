@@ -28,6 +28,27 @@ def test_list_tasks(client):
     assert len(r.json()) == 2
 
 
+def test_list_tasks_filters_by_status(client):
+    client.post("/tasks", json={"title": "Backlog", "status": "todo"})
+    client.post("/tasks", json={"title": "Shipping", "status": "done"})
+
+    r = client.get("/tasks", params={"status": "done"})
+
+    assert r.status_code == 200
+    assert [task["title"] for task in r.json()] == ["Shipping"]
+
+
+def test_list_tasks_searches_title_case_insensitively(client):
+    client.post("/tasks", json={"title": "Write PRD"})
+    client.post("/tasks", json={"title": "Review roadmap"})
+    client.post("/tasks", json={"title": "Draft release notes"})
+
+    r = client.get("/tasks", params={"q": "prd"})
+
+    assert r.status_code == 200
+    assert [task["title"] for task in r.json()] == ["Write PRD"]
+
+
 def test_update_task(client):
     task_id = client.post("/tasks", json={"title": "Draft"}).json()["id"]
     r = client.patch(f"/tasks/{task_id}", json={"status": "in_progress"})

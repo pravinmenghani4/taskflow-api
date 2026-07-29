@@ -7,12 +7,23 @@ tested without spinning up the web server.
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.models.task import Task
+from app.models.task import Task, TaskStatus
 from app.schemas.task import TaskCreate, TaskUpdate
 
 
-def list_tasks(db: Session, skip: int = 0, limit: int = 100) -> list[Task]:
-    stmt = select(Task).offset(skip).limit(limit).order_by(Task.id)
+def list_tasks(
+    db: Session,
+    skip: int = 0,
+    limit: int = 100,
+    status: TaskStatus | None = None,
+    q: str | None = None,
+) -> list[Task]:
+    stmt = select(Task)
+    if status is not None:
+        stmt = stmt.where(Task.status == status)
+    if q:
+        stmt = stmt.where(Task.title.ilike(f"%{q}%"))
+    stmt = stmt.order_by(Task.id).offset(skip).limit(limit)
     return list(db.scalars(stmt).all())
 
 
