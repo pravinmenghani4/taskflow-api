@@ -8,7 +8,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.routes import health, projects, tasks
+from app.api.routes import health, projects, tasks, agent
 from app.core.config import settings
 from app.core.database import init_db
 
@@ -34,6 +34,7 @@ app.add_middleware(
 app.include_router(health.router)
 app.include_router(projects.router)
 app.include_router(tasks.router)
+app.include_router(agent.router)
 
 
 @app.get("/", tags=["root"])

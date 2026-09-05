@@ -18,6 +18,8 @@ class Settings(BaseSettings):
     environment: str = "development"
     database_url: str = "sqlite:///./taskflow.db"
     cors_origins: str = "http://localhost:3000"
+    azure_foundry_endpoint: str = ""
+    azure_agent_id: str = ""
 
     @property
     def cors_origin_list(self) -> list[str]:
